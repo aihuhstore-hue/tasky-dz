@@ -15,7 +15,10 @@ function Request() {
   const [available, setAvailable] = useState(true);
   const [clientCommune, setClientCommune] = useState("");
   const [authError, setAuthError] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
   const [form, setForm] = useState({ description: "", address: "", phone: "" });
+
+  const validatePhone = (phone: string) => /^(05|06|07)[0-9]{8}$/.test(phone);
 
   useEffect(() => {
     const checkAvailability = async () => {
@@ -52,6 +55,13 @@ function Request() {
 
   const handleSubmit = async () => {
     setAuthError(false);
+    setPhoneError("");
+
+    if (!validatePhone(form.phone)) {
+      setPhoneError("رقم الهاتف غير صحيح — يجب أن يبدأ بـ 05 أو 06 أو 07 ويحتوي على 10 أرقام");
+      return;
+    }
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       setAuthError(true);
@@ -169,11 +179,13 @@ function Request() {
               type="tel"
               name="phone"
               dir="rtl"
-              placeholder="رقم هاتفك"
+              placeholder="رقم هاتفك (05XXXXXXXX)"
               value={form.phone}
               onChange={handleChange}
+              maxLength={10}
               className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500"
             />
+            {phoneError && <p className="text-red-500 text-xs px-1">{phoneError}</p>}
           </div>
         </div>
 
