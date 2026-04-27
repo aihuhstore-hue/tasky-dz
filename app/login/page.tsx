@@ -58,10 +58,11 @@ export default function Login() {
           <input
             type="tel"
             name="phone"
-            placeholder="رقم الهاتف"
+            placeholder="رقم الهاتف (05xxxxxxxx)"
             value={form.phone}
             onChange={handleChange}
             required
+            maxLength={10}
             className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500"
           />
           <input
