@@ -14,6 +14,7 @@ function Request() {
   const [checking, setChecking] = useState(true);
   const [available, setAvailable] = useState(true);
   const [clientCommune, setClientCommune] = useState("");
+  const [authError, setAuthError] = useState(false);
   const [form, setForm] = useState({ description: "", address: "", phone: "" });
 
   useEffect(() => {
@@ -50,8 +51,13 @@ function Request() {
   };
 
   const handleSubmit = async () => {
-    setLoading(true);
+    setAuthError(false);
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setAuthError(true);
+      return;
+    }
+    setLoading(true);
 
     const { data, error } = await supabase.from("requests").insert({
       client_id: user?.id || null,
@@ -179,6 +185,18 @@ function Request() {
             <p className="text-gray-700 font-bold text-sm">دفع عند الاستلام</p>
           </div>
         </div>
+
+        {authError && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-5 mb-4 text-center">
+            <p className="text-2xl mb-2">🔒</p>
+            <p className="text-red-700 font-bold text-base mb-1">يرجى إنشاء حساب أولاً</p>
+            <p className="text-gray-500 text-sm mb-4">يجب تسجيل الدخول لتتمكن من طلب الخدمة</p>
+            <div className="flex gap-3">
+              <a href="/register" className="flex-1 text-center bg-green-600 text-white py-2.5 rounded-xl font-bold text-sm">إنشاء حساب</a>
+              <a href="/login" className="flex-1 text-center border border-green-600 text-green-600 py-2.5 rounded-xl font-bold text-sm">تسجيل الدخول</a>
+            </div>
+          </div>
+        )}
 
         <button
           onClick={handleSubmit}
