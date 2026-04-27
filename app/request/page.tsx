@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import { useSearchParams } from "next/navigation";
 
-export default function Request() {
+function Request() {
   const searchParams = useSearchParams();
   const serviceType = searchParams.get("service") || "سباك";
   const serviceIcon = searchParams.get("icon") || "🔧";
@@ -125,5 +125,13 @@ export default function Request() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function RequestPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-green-600 font-bold">جاري التحميل...</p></div>}>
+      <Request />
+    </Suspense>
   );
 }
