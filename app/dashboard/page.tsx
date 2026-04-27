@@ -113,6 +113,14 @@ export default function Dashboard() {
                       {s.text}
                     </span>
                   </div>
+                  {req.status === "completed" && (
+                    <a
+                      href={`/review?id=${req.id}`}
+                      className="mt-3 w-full block text-center bg-yellow-400 hover:bg-yellow-500 text-white py-2 rounded-xl text-sm font-bold transition-all"
+                    >
+                      ⭐ قيّم الخدمة
+                    </a>
+                  )}
                 </div>
               );
             })}
