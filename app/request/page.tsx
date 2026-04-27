@@ -168,6 +168,7 @@ function Request() {
             <input
               type="tel"
               name="phone"
+              dir="rtl"
               placeholder="رقم هاتفك"
               value={form.phone}
               onChange={handleChange}

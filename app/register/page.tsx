@@ -119,7 +119,7 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input type="text" name="full_name" placeholder={t.full_name} value={form.full_name} onChange={handleChange} required className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500" />
-          <input type="tel" name="phone" placeholder={t.phone} value={form.phone} onChange={handleChange} required maxLength={10} className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500" />
+          <input type="tel" name="phone" dir="rtl" placeholder={t.phone} value={form.phone} onChange={handleChange} required maxLength={10} className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500" />
           <input type="email" name="email" placeholder={t.email_optional} value={form.email} onChange={handleChange} className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500" />
           <input type="password" name="password" placeholder={t.password} value={form.password} onChange={handleChange} required className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500" />
 
