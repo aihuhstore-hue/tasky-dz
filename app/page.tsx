@@ -5,12 +5,12 @@ import { useLanguage } from "@/lib/LanguageContext";
 const categoriesData = {
   ar: [
     { id: 1, name: "صيانة المنزل", icon: "🏠", available: true, services: [
-      { name: "سباك", icon: "🔧", price: "من 1500 دج", desc: "إصلاح تسربات وتمديدات المياه" },
-      { name: "كهربائي", icon: "⚡", price: "من 2000 دج", desc: "إصلاح أعطال كهربائية وتركيب" },
-      { name: "نجار", icon: "🪚", price: "من 1500 دج", desc: "إصلاح أثاث وتركيب أبواب" },
-      { name: "دهان", icon: "🎨", price: "من 3000 دج", desc: "دهان جدران وديكور" },
-      { name: "تكييف", icon: "❄️", price: "من 2500 دج", desc: "تركيب وصيانة المكيفات" },
-      { name: "غاز", icon: "🔥", price: "من 1500 دج", desc: "تمديدات وإصلاح الغاز" },
+      { name: "سباك", icon: "🔧", desc: "إصلاح تسربات وتمديدات المياه" },
+      { name: "كهربائي", icon: "⚡", desc: "إصلاح أعطال كهربائية وتركيب" },
+      { name: "نجار", icon: "🪚", desc: "إصلاح أثاث وتركيب أبواب" },
+      { name: "دهان", icon: "🎨", desc: "دهان جدران وديكور" },
+      { name: "تكييف", icon: "❄️", desc: "تركيب وصيانة المكيفات" },
+      { name: "غاز", icon: "🔥", desc: "تمديدات وإصلاح الغاز" },
     ]},
     { id: 2, name: "توصيل", icon: "🚚", available: false, services: [] },
     { id: 3, name: "دروس خصوصية", icon: "📚", available: false, services: [] },
@@ -20,12 +20,12 @@ const categoriesData = {
   ],
   fr: [
     { id: 1, name: "Maison & Réparation", icon: "🏠", available: true, services: [
-      { name: "Plombier", icon: "🔧", price: "À partir de 1500 DA", desc: "Réparation fuites et canalisations" },
-      { name: "Électricien", icon: "⚡", price: "À partir de 2000 DA", desc: "Pannes électriques et installation" },
-      { name: "Menuisier", icon: "🪚", price: "À partir de 1500 DA", desc: "Réparation meubles et portes" },
-      { name: "Peintre", icon: "🎨", price: "À partir de 3000 DA", desc: "Peinture murale et décoration" },
-      { name: "Climatisation", icon: "❄️", price: "À partir de 2500 DA", desc: "Installation et entretien clim" },
-      { name: "Gaz", icon: "🔥", price: "À partir de 1500 DA", desc: "Installation et réparation gaz" },
+      { name: "Plombier", icon: "🔧", desc: "Réparation fuites et canalisations" },
+      { name: "Électricien", icon: "⚡", desc: "Pannes électriques et installation" },
+      { name: "Menuisier", icon: "🪚", desc: "Réparation meubles et portes" },
+      { name: "Peintre", icon: "🎨", desc: "Peinture murale et décoration" },
+      { name: "Climatisation", icon: "❄️", desc: "Installation et entretien clim" },
+      { name: "Gaz", icon: "🔥", desc: "Installation et réparation gaz" },
     ]},
     { id: 2, name: "Livraison", icon: "🚚", available: false, services: [] },
     { id: 3, name: "Cours particuliers", icon: "📚", available: false, services: [] },
@@ -125,7 +125,7 @@ export default function Home() {
                           <span className="text-2xl">{service.icon}</span>
                           <div className="flex-1">
                             <p className="font-bold text-gray-700 text-sm group-hover:text-green-700">{service.name}</p>
-                            <p className="text-green-600 text-xs">{service.price}</p>
+                            <p className="text-gray-400 text-xs">{service.desc}</p>
                           </div>
                           <span className="text-gray-300 text-sm group-hover:text-green-500">{t.dir === "rtl" ? "←" : "→"}</span>
                         </a>

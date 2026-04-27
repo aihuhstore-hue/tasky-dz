@@ -148,7 +148,7 @@ function Request() {
             <span className="text-3xl">{serviceIcon}</span>
             <div>
               <p className="font-bold text-gray-800">{serviceType}</p>
-              <p className="text-green-600 text-sm font-bold">من 1500 دج</p>
+              <p className="text-gray-400 text-sm">السعر يحدده مقدم الخدمة حسب وصف المشكلة</p>
             </div>
           </div>
           {clientCommune && (
