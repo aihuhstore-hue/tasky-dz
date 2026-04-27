@@ -50,6 +50,8 @@ export default function Home() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [activeCategory, setActiveCategory] = useState<any>(null);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [mobileServices, setMobileServices] = useState(false);
+  const [mobileActiveCategory, setMobileActiveCategory] = useState<any>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const categories = categoriesData[lang];
 
@@ -151,10 +153,51 @@ export default function Home() {
         {/* Mobile menu */}
         {mobileMenu && (
           <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 flex flex-col gap-3 animate-slide-down">
-            <button onClick={() => { setMobileMenu(false); document.getElementById("services")?.scrollIntoView({ behavior: "smooth" }); }}
-              className="text-gray-700 font-bold text-base py-2 border-b border-gray-100 text-right">
-              {t.services} ▼
+            <button onClick={() => { setMobileServices(!mobileServices); setMobileActiveCategory(null); }}
+              className="flex items-center justify-between text-gray-700 font-bold text-base py-2 border-b border-gray-100 w-full">
+              <span>{t.services}</span>
+              <span className={`transition-transform duration-300 inline-block text-sm ${mobileServices ? "rotate-180" : ""}`}>▼</span>
             </button>
+
+            {mobileServices && (
+              <div className="bg-gray-50 rounded-xl p-2 flex flex-col gap-1 animate-slide-down">
+                {!mobileActiveCategory ? (
+                  <>
+                    <p className="text-xs text-gray-400 font-bold px-3 py-1">{t.choose_category}</p>
+                    {categories.map((cat) => (
+                      <button key={cat.id} onClick={() => cat.available && setMobileActiveCategory(cat)}
+                        className={`flex items-center gap-3 px-3 py-3 rounded-xl w-full transition-all ${cat.available ? "hover:bg-green-50 cursor-pointer" : "opacity-40 cursor-not-allowed"}`}>
+                        <span className="text-2xl">{cat.icon}</span>
+                        <span className="flex-1 font-bold text-gray-700 text-sm text-start">{cat.name}</span>
+                        {!cat.available
+                          ? <span className="text-xs bg-gray-200 text-gray-400 px-2 py-0.5 rounded-full">{t.coming_soon}</span>
+                          : <span className="text-gray-400 text-sm">{t.dir === "rtl" ? "←" : "→"}</span>}
+                      </button>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => setMobileActiveCategory(null)} className="flex items-center gap-2 px-3 py-2 text-green-600 font-bold text-sm rounded-xl hover:bg-green-50 w-full">
+                      {t.back_categories}
+                    </button>
+                    <p className="text-xs text-gray-400 font-bold px-3 py-1">{mobileActiveCategory.icon} {mobileActiveCategory.name}</p>
+                    {mobileActiveCategory.services.map((service: any) => (
+                      <a key={service.name} href={`/request?service=${encodeURIComponent(service.name)}&icon=${encodeURIComponent(service.icon)}`}
+                        onClick={() => setMobileMenu(false)}
+                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-green-50 transition-all">
+                        <span className="text-2xl">{service.icon}</span>
+                        <div className="flex-1">
+                          <p className="font-bold text-gray-700 text-sm">{service.name}</p>
+                          <p className="text-green-600 text-xs">{service.price}</p>
+                        </div>
+                        <span className="text-gray-400 text-sm">{t.dir === "rtl" ? "←" : "→"}</span>
+                      </a>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
+
             <a href="#how" onClick={() => setMobileMenu(false)} className="text-gray-700 font-bold text-base py-2 border-b border-gray-100 block">{t.how_it_works}</a>
             <a href="/register" onClick={() => setMobileMenu(false)} className="text-gray-700 font-bold text-base py-2 border-b border-gray-100 block">{t.join_provider}</a>
             <div className="flex gap-3 pt-2">
