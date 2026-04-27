@@ -8,6 +8,8 @@ export default function ProviderDashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [acceptingId, setAcceptingId] = useState<number | null>(null);
+  const [eta, setEta] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -29,7 +31,7 @@ export default function ProviderDashboard() {
       const { data: reqs } = await supabase
         .from("requests")
         .select("*")
-        .eq("service_type", prof.service_type === "plumber" ? "سباك" : prof.service_type === "electrician" ? "كهربائي" : "نجار")
+        .eq("service_type", prof.service_type)
         .order("created_at", { ascending: false });
 
       setRequests(reqs || []);
@@ -40,9 +42,20 @@ export default function ProviderDashboard() {
 
   const updateStatus = async (id: number, status: string) => {
     await supabase.from("requests").update({ status }).eq("id", id);
+    setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
+  };
+
+  const acceptWithEta = async (id: number) => {
+    if (!eta.trim()) return;
+    await supabase
+      .from("requests")
+      .update({ status: "accepted", estimated_time: eta.trim() })
+      .eq("id", id);
     setRequests((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status } : r))
+      prev.map((r) => r.id === id ? { ...r, status: "accepted", estimated_time: eta.trim() } : r)
     );
+    setAcceptingId(null);
+    setEta("");
   };
 
   const handleLogout = async () => {
@@ -74,7 +87,6 @@ export default function ProviderDashboard() {
 
   return (
     <main className="min-h-screen bg-gray-50" dir="rtl">
-      {/* Header */}
       <header className="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
         <button onClick={handleLogout} className="text-red-500 text-sm font-bold">خروج</button>
         <h1 className="text-xl font-bold text-green-600">لوحة مقدم الخدمة</h1>
@@ -98,7 +110,6 @@ export default function ProviderDashboard() {
           </div>
         </div>
 
-        {/* Requests */}
         <h3 className="font-bold text-gray-800 mb-4">الطلبات الواردة</h3>
 
         {requests.length === 0 ? (
@@ -127,21 +138,74 @@ export default function ProviderDashboard() {
                     </span>
                   </div>
 
-                  {req.status === "pending" && (
-                    <div className="flex gap-2 mt-3">
-                      <button
-                        onClick={() => updateStatus(req.id, "accepted")}
-                        className="flex-1 bg-green-600 text-white py-2 rounded-xl text-sm font-bold"
-                      >
-                        ✅ قبول
-                      </button>
-                      <button
-                        onClick={() => updateStatus(req.id, "cancelled")}
-                        className="flex-1 bg-red-50 text-red-600 py-2 rounded-xl text-sm font-bold"
-                      >
-                        ❌ رفض
-                      </button>
+                  {/* وقت الوصول للطلبات المقبولة */}
+                  {req.status === "accepted" && req.estimated_time && (
+                    <div className="bg-blue-50 rounded-xl px-4 py-2 mb-3 flex items-center gap-2">
+                      <span>⏱</span>
+                      <p className="text-blue-700 text-sm font-bold">وقت الوصول: {req.estimated_time}</p>
                     </div>
+                  )}
+
+                  {/* زر القبول مع تحديد وقت الوصول */}
+                  {req.status === "pending" && (
+                    acceptingId === req.id ? (
+                      <div className="mt-3 bg-green-50 rounded-2xl p-4">
+                        <p className="text-sm font-bold text-gray-700 mb-3">🕐 متى ستصل للزبون؟</p>
+                        <div className="grid grid-cols-2 gap-2 mb-3">
+                          {["30 دقيقة", "ساعة واحدة", "ساعتين", "أكثر من ساعتين"].map((opt) => (
+                            <button
+                              key={opt}
+                              onClick={() => setEta(opt)}
+                              className={`py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
+                                eta === opt
+                                  ? "border-green-600 bg-green-600 text-white"
+                                  : "border-gray-200 bg-white text-gray-600 hover:border-green-400"
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                        <input
+                          type="text"
+                          dir="rtl"
+                          placeholder="أو اكتب وقتاً آخر... (مثال: 45 دقيقة)"
+                          value={eta}
+                          onChange={(e) => setEta(e.target.value)}
+                          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-green-500 mb-3"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => acceptWithEta(req.id)}
+                            disabled={!eta.trim()}
+                            className="flex-1 bg-green-600 text-white py-2.5 rounded-xl text-sm font-bold disabled:opacity-40 transition-all"
+                          >
+                            ✅ تأكيد القبول
+                          </button>
+                          <button
+                            onClick={() => { setAcceptingId(null); setEta(""); }}
+                            className="px-5 bg-gray-100 text-gray-600 py-2.5 rounded-xl text-sm font-bold"
+                          >
+                            إلغاء
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={() => { setAcceptingId(req.id); setEta(""); }}
+                          className="flex-1 bg-green-600 text-white py-2 rounded-xl text-sm font-bold"
+                        >
+                          ✅ قبول
+                        </button>
+                        <button
+                          onClick={() => updateStatus(req.id, "cancelled")}
+                          className="flex-1 bg-red-50 text-red-600 py-2 rounded-xl text-sm font-bold"
+                        >
+                          ❌ رفض
+                        </button>
+                      </div>
+                    )
                   )}
 
                   {req.status === "accepted" && (

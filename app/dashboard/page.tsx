@@ -113,6 +113,15 @@ export default function Dashboard() {
                       {s.text}
                     </span>
                   </div>
+                  {req.status === "accepted" && req.estimated_time && (
+                    <div className="mt-3 bg-blue-50 rounded-xl px-4 py-3 flex items-center gap-3">
+                      <span className="text-xl">⏱</span>
+                      <div>
+                        <p className="text-blue-700 text-sm font-bold">تم قبول طلبك!</p>
+                        <p className="text-blue-600 text-xs mt-0.5">مقدم الخدمة سيصل خلال {req.estimated_time}</p>
+                      </div>
+                    </div>
+                  )}
                   {req.status === "completed" && (
                     <a
                       href={`/review?id=${req.id}`}
