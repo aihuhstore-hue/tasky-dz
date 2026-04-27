@@ -49,6 +49,7 @@ export default function Home() {
   const { lang, t, setLang } = useLanguage();
   const [showDropdown, setShowDropdown] = useState(false);
   const [activeCategory, setActiveCategory] = useState<any>(null);
+  const [mobileMenu, setMobileMenu] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const categories = categoriesData[lang];
 
@@ -71,77 +72,97 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white" dir={t.dir}>
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm shadow-sm py-4 px-6 flex items-center justify-between sticky top-0 z-50">
-        <h1 className="text-2xl font-bold text-green-600">Tasky DZ</h1>
+      <header className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+        <div className="py-3 px-4 flex items-center justify-between">
+          <h1 className="text-xl font-bold text-green-600">Tasky DZ</h1>
 
-        <nav className="flex items-center gap-6" ref={dropdownRef}>
-          <div className="relative">
-            <button
-              onClick={() => { setShowDropdown(!showDropdown); setActiveCategory(null); }}
-              className="flex items-center gap-1 text-gray-700 font-bold text-sm hover:text-green-600 transition-all"
-            >
-              {t.services}
-              <span className={`transition-transform duration-300 inline-block ${showDropdown ? "rotate-180" : ""}`}>▼</span>
+          {/* Mobile: language + hamburger */}
+          <div className="flex items-center gap-2 md:hidden">
+            <div className="flex bg-gray-100 rounded-lg p-0.5">
+              <button onClick={() => setLang("ar")} className={`px-2.5 py-1 rounded-md text-sm font-bold transition-all ${lang === "ar" ? "bg-green-600 text-white" : "text-gray-500"}`}>ع</button>
+              <button onClick={() => setLang("fr")} className={`px-2.5 py-1 rounded-md text-sm font-bold transition-all ${lang === "fr" ? "bg-green-600 text-white" : "text-gray-500"}`}>Fr</button>
+            </div>
+            <button onClick={() => setMobileMenu(!mobileMenu)} className="p-2 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg w-10 h-10 flex items-center justify-center">
+              {mobileMenu ? "✕" : "☰"}
             </button>
+          </div>
 
-            {showDropdown && (
-              <div className={`absolute top-10 ${t.dir === "rtl" ? "right-0" : "left-0"} bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-slide-down`} style={{ width: "260px" }}>
-                {!activeCategory ? (
-                  <div className="p-2">
-                    <p className="text-xs text-gray-400 font-bold px-3 py-2 border-b border-gray-50 mb-1">{t.choose_category}</p>
-                    {categories.map((cat) => (
-                      <button key={cat.id} onClick={() => cat.available && setActiveCategory(cat)}
-                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-${t.dir === "rtl" ? "right" : "left"} transition-all ${cat.available ? "hover:bg-green-50 cursor-pointer" : "opacity-40 cursor-not-allowed"}`}>
-                        <span className="text-2xl">{cat.icon}</span>
-                        <span className="flex-1 font-bold text-gray-700 text-sm">{cat.name}</span>
-                        {!cat.available
-                          ? <span className="text-xs bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full">{t.coming_soon}</span>
-                          : <span className="text-gray-300 text-sm">{t.dir === "rtl" ? "←" : "→"}</span>}
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-6" ref={dropdownRef}>
+            <div className="relative">
+              <button onClick={() => { setShowDropdown(!showDropdown); setActiveCategory(null); }}
+                className="flex items-center gap-1 text-gray-700 font-bold text-sm hover:text-green-600 transition-all">
+                {t.services}
+                <span className={`transition-transform duration-300 inline-block ${showDropdown ? "rotate-180" : ""}`}>▼</span>
+              </button>
+              {showDropdown && (
+                <div className={`absolute top-10 ${t.dir === "rtl" ? "right-0" : "left-0"} bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-slide-down`} style={{ width: "260px" }}>
+                  {!activeCategory ? (
+                    <div className="p-2">
+                      <p className="text-xs text-gray-400 font-bold px-3 py-2 border-b border-gray-50 mb-1">{t.choose_category}</p>
+                      {categories.map((cat) => (
+                        <button key={cat.id} onClick={() => cat.available && setActiveCategory(cat)}
+                          className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${cat.available ? "hover:bg-green-50 cursor-pointer" : "opacity-40 cursor-not-allowed"}`}>
+                          <span className="text-2xl">{cat.icon}</span>
+                          <span className="flex-1 font-bold text-gray-700 text-sm text-right">{cat.name}</span>
+                          {!cat.available
+                            ? <span className="text-xs bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full">{t.coming_soon}</span>
+                            : <span className="text-gray-300 text-sm">{t.dir === "rtl" ? "←" : "→"}</span>}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-2 animate-fade-in">
+                      <button onClick={() => setActiveCategory(null)} className="flex items-center gap-2 px-3 py-2 text-green-600 font-bold text-sm mb-1 hover:bg-green-50 rounded-xl w-full">
+                        {t.back_categories}
                       </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-2 animate-fade-in">
-                    <button onClick={() => setActiveCategory(null)} className="flex items-center gap-2 px-3 py-2 text-green-600 font-bold text-sm mb-1 hover:bg-green-50 rounded-xl w-full">
-                      {t.back_categories}
-                    </button>
-                    <p className="text-xs text-gray-400 font-bold px-3 py-1 border-b border-gray-50 mb-1">{activeCategory.icon} {activeCategory.name}</p>
-                    {activeCategory.services.map((service: any) => (
-                      <a key={service.name}
-                        href={`/request?service=${encodeURIComponent(service.name)}&icon=${encodeURIComponent(service.icon)}`}
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-green-50 transition-all group">
-                        <span className="text-2xl">{service.icon}</span>
-                        <div className="flex-1">
-                          <p className="font-bold text-gray-700 text-sm group-hover:text-green-700">{service.name}</p>
-                          <p className="text-green-600 text-xs">{service.price}</p>
-                        </div>
-                        <span className="text-gray-300 text-sm group-hover:text-green-500">{t.dir === "rtl" ? "←" : "→"}</span>
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <a href="#how" className="text-gray-600 text-sm hover:text-green-600 font-medium transition-colors">{t.how_it_works}</a>
-          <a href="/register" className="text-gray-600 text-sm hover:text-green-600 font-medium transition-colors hidden md:block">{t.join_provider}</a>
-        </nav>
+                      <p className="text-xs text-gray-400 font-bold px-3 py-1 border-b border-gray-50 mb-1">{activeCategory.icon} {activeCategory.name}</p>
+                      {activeCategory.services.map((service: any) => (
+                        <a key={service.name} href={`/request?service=${encodeURIComponent(service.name)}&icon=${encodeURIComponent(service.icon)}`}
+                          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-green-50 transition-all group">
+                          <span className="text-2xl">{service.icon}</span>
+                          <div className="flex-1">
+                            <p className="font-bold text-gray-700 text-sm group-hover:text-green-700">{service.name}</p>
+                            <p className="text-green-600 text-xs">{service.price}</p>
+                          </div>
+                          <span className="text-gray-300 text-sm group-hover:text-green-500">{t.dir === "rtl" ? "←" : "→"}</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <a href="#how" className="text-gray-600 text-sm hover:text-green-600 font-medium">{t.how_it_works}</a>
+            <a href="/register" className="text-gray-600 text-sm hover:text-green-600 font-medium">{t.join_provider}</a>
+          </nav>
 
-        <div className="flex items-center gap-2">
-          {/* Language Switcher */}
-          <div className="flex bg-gray-100 rounded-lg p-0.5 ml-2">
-            <button onClick={() => setLang("ar")}
-              className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all ${lang === "ar" ? "bg-green-600 text-white" : "text-gray-500 hover:text-gray-700"}`}>
-              ع
-            </button>
-            <button onClick={() => setLang("fr")}
-              className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all ${lang === "fr" ? "bg-green-600 text-white" : "text-gray-500 hover:text-gray-700"}`}>
-              Fr
-            </button>
+          {/* Desktop auth + lang */}
+          <div className="hidden md:flex items-center gap-2">
+            <div className="flex bg-gray-100 rounded-lg p-0.5">
+              <button onClick={() => setLang("ar")} className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all ${lang === "ar" ? "bg-green-600 text-white" : "text-gray-500"}`}>ع</button>
+              <button onClick={() => setLang("fr")} className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all ${lang === "fr" ? "bg-green-600 text-white" : "text-gray-500"}`}>Fr</button>
+            </div>
+            <a href="/login" className="text-green-600 border border-green-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-50 transition-all">{t.login}</a>
+            <a href="/register" className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition-all">{t.register}</a>
           </div>
-          <a href="/login" className="text-green-600 border border-green-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-50 transition-all">{t.login}</a>
-          <a href="/register" className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition-all">{t.register}</a>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenu && (
+          <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 flex flex-col gap-3 animate-slide-down">
+            <button onClick={() => { setMobileMenu(false); document.getElementById("services")?.scrollIntoView({ behavior: "smooth" }); }}
+              className="text-gray-700 font-bold text-base py-2 border-b border-gray-100 text-right">
+              {t.services} ▼
+            </button>
+            <a href="#how" onClick={() => setMobileMenu(false)} className="text-gray-700 font-bold text-base py-2 border-b border-gray-100 block">{t.how_it_works}</a>
+            <a href="/register" onClick={() => setMobileMenu(false)} className="text-gray-700 font-bold text-base py-2 border-b border-gray-100 block">{t.join_provider}</a>
+            <div className="flex gap-3 pt-2">
+              <a href="/login" className="flex-1 text-center text-green-600 border border-green-600 py-2.5 rounded-xl font-bold">{t.login}</a>
+              <a href="/register" className="flex-1 text-center bg-green-600 text-white py-2.5 rounded-xl font-bold">{t.register}</a>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero */}
