@@ -1,5 +1,5 @@
 "use client";
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import { useSearchParams } from "next/navigation";
 
@@ -11,7 +11,39 @@ function Request() {
   const [submitted, setSubmitted] = useState(false);
   const [requestId, setRequestId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [available, setAvailable] = useState(true);
+  const [clientCommune, setClientCommune] = useState("");
   const [form, setForm] = useState({ description: "", address: "", phone: "" });
+
+  useEffect(() => {
+    const checkAvailability = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setChecking(false); return; }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("commune, phone")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.commune) {
+        setClientCommune(profile.commune);
+        setForm((f) => ({ ...f, phone: profile.phone || "" }));
+
+        const { data: providers } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("role", "provider")
+          .eq("service_type", serviceType)
+          .eq("commune", profile.commune);
+
+        setAvailable((providers?.length || 0) > 0);
+      }
+      setChecking(false);
+    };
+    checkAvailability();
+  }, [serviceType]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -56,10 +88,39 @@ function Request() {
     );
   }
 
+  if (checking) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p className="text-green-600 font-bold">جاري التحقق من التوفر...</p>
+      </main>
+    );
+  }
+
+  if (!available) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4" dir="rtl">
+        <div className="bg-white rounded-2xl shadow-md w-full max-w-md p-8 text-center">
+          <div className="text-6xl mb-4">😔</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">الخدمة غير متوفرة</h2>
+          <p className="text-gray-500 mb-2">
+            عذراً، خدمة <span className="font-bold text-green-600">{serviceIcon} {serviceType}</span> غير متوفرة حالياً في
+          </p>
+          <p className="text-gray-700 font-bold text-lg mb-6">📍 {clientCommune}</p>
+          <div className="bg-yellow-50 rounded-xl p-4 mb-6">
+            <p className="text-yellow-700 text-sm font-bold">نعمل على التوسع قريباً في منطقتك!</p>
+          </div>
+          <a href="/" className="block bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition-all">
+            العودة للرئيسية
+          </a>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-gray-50" dir="rtl">
       <header className="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
-        <a href="/services" className="text-green-600 font-bold text-lg">← رجوع</a>
+        <a href="/" className="text-green-600 font-bold text-lg">← رجوع</a>
         <h1 className="text-xl font-bold text-gray-800">تفاصيل الطلب</h1>
         <div className="w-16"></div>
       </header>
@@ -74,6 +135,9 @@ function Request() {
               <p className="text-green-600 text-sm font-bold">من 1500 دج</p>
             </div>
           </div>
+          {clientCommune && (
+            <p className="text-gray-400 text-sm mt-2">📍 {clientCommune} — الخدمة متوفرة ✅</p>
+          )}
         </div>
 
         <div className="bg-white rounded-2xl p-5 shadow-sm mb-6">
@@ -90,7 +154,7 @@ function Request() {
             <input
               type="text"
               name="address"
-              placeholder="عنوانك (الحي، المدينة)"
+              placeholder="عنوانك (الحي، الشارع)"
               value={form.address}
               onChange={handleChange}
               className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500"
