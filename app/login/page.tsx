@@ -13,10 +13,18 @@ export default function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const validatePhone = (phone: string) => /^(05|06|07)[0-9]{8}$/.test(phone);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    if (!validatePhone(form.phone)) {
+      setError("رقم الهاتف غير صحيح — يجب أن يبدأ بـ 05 أو 06 أو 07 ويحتوي على 10 أرقام");
+      setLoading(false);
+      return;
+    }
 
     const email = `user_${form.phone}@tasky.dz`;
 
