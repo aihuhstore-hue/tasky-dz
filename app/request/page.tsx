@@ -137,7 +137,7 @@ function Request() {
     <main className="min-h-screen bg-gray-50" dir="rtl">
       <header className="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
         <a href="/" className="text-green-600 font-bold text-lg">← رجوع</a>
-        <h1 className="text-xl font-bold text-gray-800">تفاصيل الطلب</h1>
+        <a href="/" className="text-xl font-bold text-green-600">Tasky DZ</a>
         <div className="w-16"></div>
       </header>
 
